@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Power controls for the PC Gamer Tuya WiFi board." />
+    <title>PC Gamer — Power</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/js/app.js" defer></script>
+  </head>
+  <body>
+    <main class="page">
+      <section class="card" aria-labelledby="page-title">
+        <h1 id="page-title">PC Gamer</h1>
+
+        <p class="status" role="status" aria-live="polite">
+          <span id="status-dot" class="dot is-off" aria-hidden="true"></span>
+          <span id="status-text">Loading…</span>
+        </p>
+
+        <div class="actions">
+          <button type="button" id="btn-on" class="btn btn-on">Power ON</button>
+          <button type="button" id="btn-off" class="btn btn-off">Power OFF</button>
+        </div>
+
+        <div class="actions actions-secondary">
+          <button type="button" id="btn-reset" class="btn">Reset</button>
+          <button type="button" id="btn-force-reset" class="btn">Force Reset</button>
+        </div>
+
+        <p id="message" class="message" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+  </body>
+</html>

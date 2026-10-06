@@ -1,0 +1,19 @@
+{
+  "name": "tuya-panel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Simple on/off dashboard for Tuya WiFi board",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

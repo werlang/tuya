@@ -465,6 +465,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .seg-row {
+    grid-template-columns: 1fr;
+  }
+
   .btn {
     padding: 0.7rem 1.1rem;
   }

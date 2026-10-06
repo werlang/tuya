@@ -1,5 +1,6 @@
 import { PowerCard } from './components/power-card.js';
 import { DeviceInfo } from './components/device-info.js';
+import { ScheduleCard } from './components/schedule-card.js';
 
 /**
  * Query a required element by id.
@@ -33,6 +34,9 @@ function bootstrap() {
 
   const info = new DeviceInfo({ root: getElement('page'), notify });
   info.init();
+
+  const schedules = new ScheduleCard({ root: getElement('schedules-card'), notify });
+  schedules.init();
 }
 
 bootstrap();

@@ -76,6 +76,50 @@
         </div>
       </section>
 
+      <section class="card schedules" id="schedules-card" aria-labelledby="schedules-title" aria-busy="false">
+        <h2 id="schedules-title">Timers</h2>
+        <div class="seg" role="group" aria-label="Timer action">
+          <label><input type="radio" name="sched-action" value="off" checked />Turn off</label>
+          <label><input type="radio" name="sched-action" value="on" />Turn on</label>
+        </div>
+        <div class="seg" role="group" aria-label="Timer mode">
+          <label><input type="radio" name="sched-mode" value="in" checked />In…</label>
+          <label><input type="radio" name="sched-mode" value="at" />At…</label>
+        </div>
+        <div class="sched-row" data-hook="panel-in">
+          <label class="visually-hidden" for="sched-amount">Amount</label>
+          <input id="sched-amount" data-hook="amount" type="number" min="1" max="20160" value="30" inputmode="numeric" />
+          <label class="visually-hidden" for="sched-unit">Unit</label>
+          <select id="sched-unit" data-hook="unit">
+            <option value="minutes">minutes</option>
+            <option value="hours">hours</option>
+          </select>
+        </div>
+        <div class="sched-row" data-hook="panel-at" hidden>
+          <label class="visually-hidden" for="sched-at">Date and time</label>
+          <input id="sched-at" data-hook="at" type="datetime-local" />
+        </div>
+        <div class="sched-row">
+          <button type="button" class="btn btn-small btn-primary" data-hook="create">Add timer</button>
+        </div>
+        <p class="hint">Fixed times use this device's timezone (<span data-hook="tz">local time</span>). Timers live in server memory and clear on restart.</p>
+        <div class="table-wrap" data-hook="timer-table" hidden>
+          <table class="sched-table">
+            <thead>
+              <tr>
+                <th scope="col">Action</th>
+                <th scope="col">When</th>
+                <th scope="col">In</th>
+                <th scope="col"><span class="visually-hidden">Cancel</span></th>
+              </tr>
+            </thead>
+            <tbody data-hook="timer-body"></tbody>
+          </table>
+        </div>
+        <p class="hint" data-hook="timer-empty">No timers scheduled.</p>
+        <p class="error" data-hook="error" role="alert" hidden></p>
+      </section>
+
       <p id="message" class="message" role="status" aria-live="polite"></p>
     </main>
   </body>

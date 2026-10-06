@@ -8,7 +8,7 @@ import { Device } from '../model/device.js';
  * @param {import('express').Response} res Express response.
  * @returns {boolean} True when configured (caller should proceed).
  */
-function requireConfigured(device, res) {
+export function requireConfigured(device, res) {
   if (device.isConfigured) return true;
   sendFail(res, {
     status: 500,

@@ -4,6 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { buildDeviceRouter } from './routes/device.js';
+import { buildScheduleRouter } from './routes/schedules.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import { sendOk } from './helpers/response.js';
 
@@ -15,10 +16,11 @@ const defaultPublicDir = path.resolve(currentDir, '../public');
  * @param {object} options App dependencies.
  * @param {{ isConfigured: boolean }} options.config Panel config.
  * @param {import('./model/device.js').Device} options.device Device entity.
+ * @param {import('./model/schedule.js').Scheduler} options.scheduler Timer scheduler.
  * @param {string} [options.publicDir] Directory serving static frontend files.
  * @returns {import('express').Express} Configured app.
  */
-export function createApp({ config, device, publicDir = defaultPublicDir }) {
+export function createApp({ config, device, scheduler, publicDir = defaultPublicDir }) {
   const app = express();
 
   app.disable('x-powered-by');
@@ -37,6 +39,7 @@ export function createApp({ config, device, publicDir = defaultPublicDir }) {
   });
 
   app.use('/api', buildDeviceRouter({ device }));
+  app.use('/api/schedules', buildScheduleRouter({ scheduler, device }));
 
   app.use(
     express.static(publicDir, {

@@ -43,9 +43,15 @@ export class Scheduler {
 
     const hasIn = inSeconds !== undefined;
     const hasAt = at !== undefined;
-    if (hasIn === hasAt) {
+    if (hasIn && hasAt) {
       return {
         error: 'Provide either inSeconds or at, not both.',
+        code: 'INVALID_SCHEDULE',
+      };
+    }
+    if (!hasIn && !hasAt) {
+      return {
+        error: 'Provide inSeconds or at.',
         code: 'INVALID_SCHEDULE',
       };
     }
@@ -99,7 +105,11 @@ export class Scheduler {
       };
     }
     const id = randomUUID();
-    const delayMs = Math.max(0, Date.parse(runAt) - Date.now());
+    const parsed = Date.parse(runAt);
+    if (Number.isNaN(parsed)) {
+      return { error: 'runAt must be an ISO datetime string.', code: 'INVALID_TIME' };
+    }
+    const delayMs = Math.max(0, parsed - Date.now());
     const timer = setTimeout(() => this.fire(id), delayMs);
     this.jobs.set(id, { id, action, kind, runAt, timer });
     return { job: { id, action, kind, runAt } };

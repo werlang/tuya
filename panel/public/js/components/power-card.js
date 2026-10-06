@@ -3,8 +3,9 @@ import { Device } from '../models/device.js';
 const POLL_INTERVAL_MS = 5000;
 
 function labelForStatus(status) {
-  if (!status || status.online === null) return 'unknown';
+  if (!status || status.online == null) return 'unknown';
   if (status.online === false) return 'offline';
+  if (typeof status.switch_1 !== 'boolean') return 'unknown';
   return status.switch_1 ? 'ON' : 'OFF';
 }
 
@@ -18,7 +19,6 @@ export class PowerCard {
   constructor({ elements, confirmFn = (message) => window.confirm(message) }) {
     this.elements = elements;
     this.confirmFn = confirmFn;
-    this.statusLookup = new Map();
     this.isBusy = false;
   }
 
@@ -36,9 +36,7 @@ export class PowerCard {
   /** Refresh status from the API and render it. */
   async refresh() {
     try {
-      const status = await Device.fetchStatus();
-      this.statusLookup.set('latest', status);
-      this.renderStatus(status);
+      this.renderStatus(await Device.fetchStatus());
     } catch {
       this.renderStatus(null);
     }

@@ -297,10 +297,6 @@ body {
 
 /* Schedules */
 
-.schedules h2 {
-  text-align: left;
-}
-
 .seg {
   display: flex;
   border: 1px solid var(--card-border);

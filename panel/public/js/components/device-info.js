@@ -7,7 +7,7 @@ import { Device } from '../models/device.js';
  */
 export class DeviceInfo {
   /**
-   * @param {{ root: HTMLElement, notify?: (message: string) => void }} options Component options (root spans the device-related cards).
+   * @param {{ root: HTMLElement, notify?: (message: string) => void }} options Component options (root is the device card).
    */
   constructor({ root, notify = () => {} }) {
     this.root = root;

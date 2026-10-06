@@ -32,7 +32,7 @@ function bootstrap() {
   });
   power.init();
 
-  const info = new DeviceInfo({ root: getElement('page'), notify });
+  const info = new DeviceInfo({ root: getElement('device-card'), notify });
   info.init();
 
   const schedules = new ScheduleCard({ root: getElement('schedules-card'), notify });

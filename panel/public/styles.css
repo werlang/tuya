@@ -297,12 +297,18 @@ body {
 
 /* Schedules */
 
+.seg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
 .seg {
   display: flex;
   border: 1px solid var(--card-border);
   border-radius: 0.5rem;
   overflow: hidden;
-  margin-top: 0.75rem;
 }
 
 .seg label {
@@ -357,6 +363,11 @@ body {
 
 .sched-row input[type="datetime-local"] {
   flex: 1;
+}
+
+.sched-row .btn {
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .hint {

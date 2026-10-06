@@ -56,14 +56,14 @@ export class ScheduleCard {
     }
   }
 
-  /** Wire up the form, show the local timezone, and start polling. */
+  /** Wire up the form and start polling. */
   init() {
-    this.hook('tz').textContent =
-      Intl.DateTimeFormat().resolvedOptions().timeZone || 'local time';
     for (const mode of this.modeRadios()) {
       mode.addEventListener('change', () => this.renderMode());
     }
-    this.hook('create').addEventListener('click', () => this.create());
+    for (const button of this.createButtons()) {
+      button.addEventListener('click', () => this.create());
+    }
     this.renderMode();
     this.load();
     setInterval(() => this.load(), POLL_INTERVAL_MS);
@@ -161,7 +161,7 @@ export class ScheduleCard {
     }
 
     this.isSaving = true;
-    this.hook('create').disabled = true;
+    this.setCreateBusy(true);
     try {
       await Schedule.create(payload);
       this.notify('Timer set.');
@@ -170,7 +170,7 @@ export class ScheduleCard {
       this.notify(`Couldn't set timer: ${error.message}`);
     } finally {
       this.isSaving = false;
-      this.hook('create').disabled = false;
+      this.setCreateBusy(false);
     }
   }
 
@@ -201,6 +201,21 @@ export class ScheduleCard {
   selectedMode() {
     const checked = this.root.querySelector('input[name="sched-mode"]:checked');
     return checked?.value === 'at' ? 'at' : 'in';
+  }
+
+  /** @returns {HTMLButtonElement[]} Both Add timer buttons (one per mode panel). */
+  createButtons() {
+    return [this.hook('create'), this.hook('create-at')];
+  }
+
+  /**
+   * Enable/disable both Add timer buttons.
+   * @param {boolean} isBusy Whether a create is in flight.
+   */
+  setCreateBusy(isBusy) {
+    for (const button of this.createButtons()) {
+      button.disabled = isBusy;
+    }
   }
 
   /** @returns {HTMLInputElement[]} Mode radio inputs. */

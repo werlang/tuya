@@ -78,13 +78,15 @@
 
       <section class="card schedules" id="schedules-card" aria-labelledby="schedules-title" aria-busy="false">
         <h2 id="schedules-title">Timers</h2>
-        <div class="seg" role="group" aria-label="Timer action">
-          <label><input type="radio" name="sched-action" value="off" checked />Turn off</label>
-          <label><input type="radio" name="sched-action" value="on" />Turn on</label>
-        </div>
-        <div class="seg" role="group" aria-label="Timer mode">
-          <label><input type="radio" name="sched-mode" value="in" checked />In…</label>
-          <label><input type="radio" name="sched-mode" value="at" />At…</label>
+        <div class="seg-row">
+          <div class="seg" role="group" aria-label="Timer action">
+            <label><input type="radio" name="sched-action" value="off" checked />Turn off</label>
+            <label><input type="radio" name="sched-action" value="on" />Turn on</label>
+          </div>
+          <div class="seg" role="group" aria-label="Timer mode">
+            <label><input type="radio" name="sched-mode" value="in" checked />In…</label>
+            <label><input type="radio" name="sched-mode" value="at" />At…</label>
+          </div>
         </div>
         <div class="sched-row" data-hook="panel-in">
           <label class="visually-hidden" for="sched-amount">Amount</label>
@@ -94,15 +96,13 @@
             <option value="minutes">minutes</option>
             <option value="hours">hours</option>
           </select>
+          <button type="button" class="btn btn-small btn-primary" data-hook="create">Add timer</button>
         </div>
         <div class="sched-row" data-hook="panel-at" hidden>
           <label class="visually-hidden" for="sched-at">Date and time</label>
           <input id="sched-at" data-hook="at" type="datetime-local" />
+          <button type="button" class="btn btn-small btn-primary" data-hook="create-at">Add timer</button>
         </div>
-        <div class="sched-row">
-          <button type="button" class="btn btn-small btn-primary" data-hook="create">Add timer</button>
-        </div>
-        <p class="hint">Fixed times use this device's timezone (<span data-hook="tz">local time</span>). Timers persist across restarts.</p>
         <div class="table-wrap" data-hook="timer-table" hidden>
           <table class="sched-table">
             <thead>

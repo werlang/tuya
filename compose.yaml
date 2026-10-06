@@ -1,0 +1,28 @@
+services:
+    tuya:
+        build:
+            context: .
+        env_file:
+            - .env
+        environment:
+            - TUYA_API_KEY=${TUYA_API_KEY:-}
+        volumes:
+            - ./config:/root/.tuya-cli
+        stdin_open: true
+        tty: true
+        command: tail -f /dev/null
+    panel:
+        image: node:26-alpine
+        working_dir: /app
+        env_file:
+            - .env
+        environment:
+            - TUYA_API_KEY=${TUYA_API_KEY:-}
+            - TUYA_DEVICE_ID=${TUYA_DEVICE_ID:-}
+            - TUYA_BASE_URL=${TUYA_BASE_URL:-}
+            - PANEL_PORT=8080
+        volumes:
+            - ./panel:/app
+        ports:
+            - 8080:8080
+        command: node server.js

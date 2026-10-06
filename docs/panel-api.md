@@ -112,9 +112,9 @@ curl -X PUT http://localhost:8080/api/device \
   -d '{"name": "PC Gamer"}'
 ```
 
-## Schedules (in-memory timers)
+## Schedules (file-backed timers)
 
-One-shot on/off timers kept in server memory — **a panel restart clears them**. Countdown (`inSeconds`) or fixed time (`at` as an absolute ISO instant).
+One-shot on/off timers persisted to `SCHEDULE_FILE` (`panel/data/schedules.json`, gitignored) — **restarts re-arm them**; only past-due timers are dropped. Countdown (`inSeconds`) or fixed time (`at` as an absolute ISO instant).
 
 Fixed times are produced by the caller's clock (the UI converts its `datetime-local` input with the browser timezone to UTC), so the server timezone never matters. Max horizon 14 days (also the `setTimeout` ceiling), max 20 pending timers.
 

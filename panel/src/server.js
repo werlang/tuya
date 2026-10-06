@@ -2,6 +2,7 @@ import { createApp } from './app.js';
 import { loadConfig } from './config.js';
 import { Device } from './model/device.js';
 import { Scheduler } from './model/schedule.js';
+import { loadJobs, saveJobs } from './helpers/scheduleStore.js';
 
 const config = loadConfig();
 const device = new Device({
@@ -16,7 +17,19 @@ const scheduler = new Scheduler({
       throw new Error('Tuya rejected the scheduled command');
     }
   },
+  onChange: () => {
+    saveJobs(config.scheduleFile, scheduler.persist()).catch((error) => {
+      console.error('[schedules] persist failed:', error?.message || error);
+    });
+  },
 });
+
+const stored = await loadJobs(config.scheduleFile);
+const { restored, dropped } = scheduler.restore(stored);
+if (restored > 0 || dropped > 0) {
+  console.log(`schedules: restored ${restored}, dropped ${dropped} past-due`);
+}
+
 const app = createApp({ config, device, scheduler });
 
 const server = app.listen(config.port, () => {

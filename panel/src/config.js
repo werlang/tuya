@@ -1,3 +1,9 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const defaultScheduleFile = path.resolve(currentDir, '../data/schedules.json');
+
 const DATA_CENTER_MAP = {
   AY: 'https://openapi.tuyacn.com',
   AZ: 'https://openapi.tuyaus.com',
@@ -23,7 +29,7 @@ export function baseUrlFromKey(apiKey) {
 /**
  * Load and normalize panel configuration from the environment.
  * @param {NodeJS.ProcessEnv} [env] Environment source (defaults to process.env).
- * @returns {{ port: number, apiKey: string, deviceId: string, baseUrl: string, isConfigured: boolean }} Normalized config.
+ * @returns {{ port: number, apiKey: string, deviceId: string, baseUrl: string, scheduleFile: string, isConfigured: boolean }} Normalized config.
  */
 export function loadConfig(env = process.env) {
   const port = Number.parseInt(env.PANEL_PORT || '8080', 10);
@@ -36,6 +42,7 @@ export function loadConfig(env = process.env) {
     apiKey,
     deviceId,
     baseUrl,
+    scheduleFile: (env.SCHEDULE_FILE || '').trim() || defaultScheduleFile,
     isConfigured: Boolean(apiKey && deviceId),
   };
 }

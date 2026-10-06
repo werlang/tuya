@@ -39,7 +39,7 @@ open http://localhost:8080
 - `GET /api/model` — Thing Model capabilities
 - `POST /api/control {"switch_1": true|false}` or `{"ModeReset": "Reset"|"forceReset"}`
 - `PUT /api/device {"name": "..."}` — rename (1–64 chars)
-- `GET /api/schedules` — pending one-shot timers (in-memory, cleared on restart)
+- `GET /api/schedules` — pending one-shot timers (file-backed, re-armed on restart)
 - `POST /api/schedules {"action": "off", "inSeconds": 1800}` or `{"action": "on", "at": "<ISO instant>"}`
 - `DELETE /api/schedules/<id>` — cancel a timer
 
@@ -57,6 +57,7 @@ panel/
     model/device.js      # Tuya OpenAPI entity
     model/schedule.js    # timer validation + lifecycle
     helpers/response.js  # ok/fail/asyncHandler
+    helpers/scheduleStore.js # atomic JSON timer state
     middlewares/errorHandler.js
   public/
     index.html                   # device card + power card

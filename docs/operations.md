@@ -21,11 +21,12 @@ open http://localhost:8080
 | `TUYA_DEVICE_ID` | yes (for real calls) | — | panel device endpoints |
 | `TUYA_BASE_URL` | no | derived from key prefix (`sk-<XX>`: AY/AZ/EU/IN/UE/WE/SG) else `https://openapi.tuyaus.com` | panel upstream base |
 | `PANEL_PORT` | no | `8080` | panel listen port (invalid → `8080`) |
+| `SCHEDULE_FILE` | no | `panel/data/schedules.json` | timer state file (gitignored) |
 | `NODE_ENV` | no | `production` in Compose | panel static cache (`1h` only in production, else `0`) |
 
-`.env`, `config/`, and `panel/node_modules/` are gitignored. `config/` holds `tuya-cli` auth state — delete it (or re-run `tuya init`) if CLI auth breaks. Never commit real keys or device IDs.
+`.env`, `config/`, `panel/node_modules/`, and `panel/data/` are gitignored. `config/` holds `tuya-cli` auth state — delete it (or re-run `tuya init`) if CLI auth breaks. Never commit real keys or device IDs.
 
-Timers are in-memory only: restarting the `panel` container (including every `docker compose up`) clears pending timers. The container timezone is irrelevant — fixed times are stored as absolute instants from the browser's timezone.
+Timers persist in `panel/data/schedules.json` (JSON array, written atomically on every change). Restarting the `panel` container re-arms future timers; past-due ones are dropped with a log line, never fired catch-up. The container timezone is irrelevant — fixed times are stored as absolute instants from the browser's timezone. Override the path with `SCHEDULE_FILE` if needed.
 
 ## Docker services
 

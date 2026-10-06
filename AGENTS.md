@@ -27,6 +27,7 @@ panel/
     model/device.js      # Device entity — all Tuya HTTP lives here
     model/schedule.js    # Scheduler entity — timer validation + lifecycle
     helpers/response.js  # sendOk / sendFail / asyncHandler
+    helpers/scheduleStore.js # atomic JSON timer state (loadJobs / saveJobs)
     middlewares/errorHandler.js  # notFoundHandler / errorHandler
   public/
     index.html                   # device card + power card
@@ -82,7 +83,7 @@ cd panel && npm install && npm run dev   # local panel dev (node --watch), needs
 
 ## Guardrails
 
-- Never commit `.env`, `config/`, or `panel/node_modules/` (all gitignored). Never paste real `sk-` keys or device IDs into docs or chat.
+- Never commit `.env`, `config/`, `panel/node_modules/`, or `panel/data/` (all gitignored). Never paste real `sk-` keys or device IDs into docs or chat.
 - Tuya upstream timeout is 10s (`TUYA_TIMEOUT` → 504). Do not raise `express.json()` limit (`16kb`) without reason.
 - `panel` container runs `npm install` on start (bind mount, no built image). Do not assume `node_modules` exists on a fresh checkout.
 - No `404.html` exists: non-API 404s fall back to plain-text `Not found`. Do not document a custom 404 page.

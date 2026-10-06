@@ -9,17 +9,20 @@ function isRecord(value) {
 
 /**
  * In-memory one-shot scheduler. Owns pending timers and their validation.
- * Jobs vanish on process restart by design (see docs/operations.md).
+ * Durability is delegated outward: callers persist `persist()` output
+ * (e.g. via helpers/scheduleStore.js) and re-arm via `restore()`.
  */
 export class Scheduler {
   /**
    * @param {object} options Constructor options.
    * @param {(action: 'on' | 'off') => Promise<unknown>} options.execute Called when a job fires.
    * @param {number} [options.maxJobs] Maximum pending jobs.
+   * @param {() => void} [options.onChange] Called after every mutation (schedule/cancel/fire).
    */
-  constructor({ execute, maxJobs = MAX_JOBS }) {
+  constructor({ execute, maxJobs = MAX_JOBS, onChange = () => {} }) {
     this.execute = execute;
     this.maxJobs = maxJobs;
+    this.onChange = onChange;
     this.jobs = new Map();
   }
 
@@ -109,10 +112,38 @@ export class Scheduler {
     if (Number.isNaN(parsed)) {
       return { error: 'runAt must be an ISO datetime string.', code: 'INVALID_TIME' };
     }
-    const delayMs = Math.max(0, parsed - Date.now());
-    const timer = setTimeout(() => this.fire(id), delayMs);
-    this.jobs.set(id, { id, action, kind, runAt, timer });
+    this.armJob({ id, action, kind, runAt });
+    this.onChange();
     return { job: { id, action, kind, runAt } };
+  }
+
+  /**
+   * Re-arm persisted jobs (e.g. after a restart). Past-due, invalid, and
+   * over-capacity entries are dropped and counted, never fired catch-up.
+   * @param {Array<{ id: string, action: 'on' | 'off', kind: 'in' | 'at', runAt: string }>} jobs Stored jobs.
+   * @returns {{ restored: number, dropped: number }} Outcome counts.
+   */
+  restore(jobs) {
+    let restored = 0;
+    let dropped = 0;
+    const now = Date.now();
+    for (const job of jobs) {
+      const valid =
+        isRecord(job) &&
+        typeof job.id === 'string' &&
+        (job.action === 'on' || job.action === 'off') &&
+        (job.kind === 'in' || job.kind === 'at') &&
+        typeof job.runAt === 'string' &&
+        Date.parse(job.runAt) > now;
+      if (!valid || this.jobs.size >= this.maxJobs) {
+        dropped += 1;
+        continue;
+      }
+      this.armJob({ id: job.id, action: job.action, kind: job.kind, runAt: job.runAt });
+      restored += 1;
+    }
+    if (restored > 0) this.onChange();
+    return { restored, dropped };
   }
 
   /**
@@ -125,7 +156,21 @@ export class Scheduler {
     if (!job) return false;
     clearTimeout(job.timer);
     this.jobs.delete(id);
+    this.onChange();
     return true;
+  }
+
+  /**
+   * Persistable snapshot of pending jobs (no timers, no derived fields).
+   * @returns {Array<{ id: string, action: 'on' | 'off', kind: 'in' | 'at', runAt: string }>} Storable jobs.
+   */
+  persist() {
+    return [...this.jobs.values()].map(({ id, action, kind, runAt }) => ({
+      id,
+      action,
+      kind,
+      runAt,
+    }));
   }
 
   /**
@@ -156,10 +201,22 @@ export class Scheduler {
     const job = this.jobs.get(id);
     if (!job) return;
     this.jobs.delete(id);
+    this.onChange();
     try {
       await this.execute(job.action);
     } catch (error) {
       console.error(`[scheduler] job ${id} failed:`, error?.message || error);
     }
+  }
+
+  /**
+   * Arm the setTimeout for a job record already present in validation.
+   * @param {{ id: string, action: 'on' | 'off', kind: 'in' | 'at', runAt: string }} job Job record.
+   * @returns {void}
+   */
+  armJob({ id, action, kind, runAt }) {
+    const delayMs = Math.max(0, Date.parse(runAt) - Date.now());
+    const timer = setTimeout(() => this.fire(id), delayMs);
+    this.jobs.set(id, { id, action, kind, runAt, timer });
   }
 }

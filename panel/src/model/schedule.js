@@ -174,15 +174,17 @@ export class Scheduler {
   }
 
   /**
-   * List pending jobs with remaining time.
+   * List pending jobs with remaining time, soonest first.
    * @returns {Array<{ id: string, action: 'on' | 'off', kind: 'in' | 'at', runAt: string, remainingMs: number }>} Pending jobs.
    */
   list() {
     const now = Date.now();
-    return [...this.jobs.values()].map(({ timer: _timer, ...job }) => ({
-      ...job,
-      remainingMs: Math.max(0, Date.parse(job.runAt) - now),
-    }));
+    return [...this.jobs.values()]
+      .sort((a, b) => Date.parse(a.runAt) - Date.parse(b.runAt))
+      .map(({ timer: _timer, ...job }) => ({
+        ...job,
+        remainingMs: Math.max(0, Date.parse(job.runAt) - now),
+      }));
   }
 
   /** Clear all pending timers (used on shutdown). */

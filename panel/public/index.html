@@ -3,33 +3,80 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Power controls for the PC Gamer Tuya WiFi board." />
+    <meta name="description" content="Power controls and device info for the PC Gamer Tuya WiFi board." />
     <title>PC Gamer — Power</title>
     <link rel="stylesheet" href="/styles.css" />
     <script type="module" src="/js/app.js" defer></script>
   </head>
   <body>
-    <main class="page">
-      <section class="card" aria-labelledby="page-title">
-        <h1 id="page-title">PC Gamer</h1>
+    <main class="page" id="page">
+      <section class="card device" id="device-card" aria-labelledby="device-name" aria-busy="true">
+        <div class="device-top">
+          <div class="device-title">
+            <h1 id="device-name" data-hook="name">Loading…</h1>
+            <button type="button" class="icon-btn" data-hook="edit-name" title="Rename device" aria-label="Rename device">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M11.5 2.5 13.5 4.5 5 13l-3 1 1-3 8.5-8.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <p class="pill" role="status" aria-live="polite">
+            <span id="status-dot" class="dot is-off" aria-hidden="true"></span>
+            <span id="status-text">loading…</span>
+            <span class="pill-update" data-hook="update-badge" title="Firmware update available" hidden>update</span>
+          </p>
+        </div>
 
-        <p class="status" role="status" aria-live="polite">
-          <span id="status-dot" class="dot is-off" aria-hidden="true"></span>
-          <span id="status-text">Loading…</span>
-        </p>
+        <div class="editor" data-hook="editor" hidden>
+          <label class="visually-hidden" for="name-input">Device name</label>
+          <input id="name-input" data-hook="name-input" type="text" maxlength="64" autocomplete="off" placeholder="Device name" />
+          <button type="button" class="btn btn-small btn-primary" data-hook="save-rename">Save</button>
+          <button type="button" class="btn btn-small" data-hook="cancel-rename">Cancel</button>
+        </div>
 
+        <dl class="meta">
+          <div class="meta-item">
+            <dt>Product</dt>
+            <dd data-hook="product">—</dd>
+          </div>
+          <div class="meta-item">
+            <dt>Category</dt>
+            <dd data-hook="category">—</dd>
+          </div>
+          <div class="meta-item">
+            <dt>Firmware</dt>
+            <dd data-hook="firmware">—</dd>
+          </div>
+          <div class="meta-item">
+            <dt>Device ID</dt>
+            <dd class="id-row">
+              <code data-hook="device-id">—</code>
+              <button type="button" class="icon-btn" data-hook="copy-id" title="Copy device ID" aria-label="Copy device ID">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M9.5 4.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </dd>
+          </div>
+        </dl>
+
+        <p class="error" data-hook="error" role="alert" hidden></p>
+      </section>
+
+      <section class="card power" aria-labelledby="power-title">
+        <h2 id="power-title">Power</h2>
         <div class="actions">
           <button type="button" id="btn-on" class="btn btn-on">Power ON</button>
           <button type="button" id="btn-off" class="btn btn-off">Power OFF</button>
         </div>
-
         <div class="actions actions-secondary">
           <button type="button" id="btn-reset" class="btn">Reset</button>
           <button type="button" id="btn-force-reset" class="btn">Force Reset</button>
         </div>
-
-        <p id="message" class="message" role="status" aria-live="polite"></p>
       </section>
+
+      <p id="message" class="message" role="status" aria-live="polite"></p>
     </main>
   </body>
 </html>

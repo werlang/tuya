@@ -119,7 +119,7 @@ export class PowerCard {
 
   /**
    * Show a status message.
-   * @param {string} Message text.
+   * @param {string} message Message text.
    */
   setMessage(message) {
     this.elements.message.textContent = message;

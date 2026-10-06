@@ -101,6 +101,142 @@ export class Device {
   }
 
   /**
+   * Fetch full device detail (identity, firmware, live properties).
+   * @returns {Promise<{ device_id: string, name: string | null, category: string | null, category_name: string | null, product_name: string | null, online: boolean | null, firmware_version: string | null, firmware_update_available: boolean, properties: Record<string, unknown> }>} Normalized detail.
+   */
+  async getDetail() {
+    const payload = await this.requestJson(
+      `/v1.0/end-user/devices/${this.deviceId}/detail`,
+      { method: 'GET' },
+    );
+    const result = isRecord(payload?.result) ? payload.result : {};
+    const textOrNull = (value) =>
+      typeof value === 'string' && value ? value : null;
+
+    return {
+      device_id:
+        typeof result.device_id === 'string' && result.device_id
+          ? result.device_id
+          : this.deviceId,
+      name: textOrNull(result.name),
+      category: textOrNull(result.category),
+      category_name: textOrNull(result.category_name),
+      product_name: textOrNull(result.product_name),
+      online: typeof result.online === 'boolean' ? result.online : null,
+      firmware_version: textOrNull(result.firmware_version),
+      firmware_update_available: result.firmware_update_available === true,
+      properties: isRecord(result.properties) ? result.properties : {},
+    };
+  }
+
+  /**
+   * Fetch the device Thing Model and flatten it to a capability list.
+   * @returns {Promise<{ modelId: string | null, properties: Array<{ code: string, name: string, access: string, type: string, spec: string }> }>} Normalized capabilities.
+   */
+  async getModel() {
+    const payload = await this.requestJson(
+      `/v1.0/end-user/devices/${this.deviceId}/model`,
+      { method: 'GET' },
+    );
+    const raw = payload?.result?.model;
+    let parsed;
+    try {
+      parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    } catch {
+      const err = new Error('Device model was not valid JSON');
+      err.code = 'MODEL_PARSE_ERROR';
+      err.status = 502;
+      throw err;
+    }
+    const services = Array.isArray(parsed?.services) ? parsed.services : [];
+    const properties = [];
+    for (const service of services) {
+      if (!isRecord(service) || !Array.isArray(service.properties)) continue;
+      for (const prop of service.properties) {
+        if (!isRecord(prop) || typeof prop.code !== 'string') continue;
+        properties.push(Device.describeProperty(prop));
+      }
+    }
+    return {
+      modelId: typeof parsed?.modelId === 'string' ? parsed.modelId : null,
+      properties,
+    };
+  }
+
+  /**
+   * Rename the device.
+   * @param {string} name Validated new name.
+   * @returns {Promise<{ success: boolean, raw: unknown }>} Tuya result.
+   */
+  async renameDevice(name) {
+    const payload = await this.requestJson(
+      `/v1.0/end-user/devices/${this.deviceId}/attribute`,
+      { method: 'POST', body: JSON.stringify({ name }) },
+    );
+    return { success: payload?.success === true, raw: payload };
+  }
+
+  /**
+   * Validate and normalize a rename request body.
+   * @param {unknown} body Raw request body.
+   * @returns {{ name: string } | { error: string, code: string }} Validation result.
+   */
+  static parseName(body) {
+    if (!isRecord(body) || typeof body.name !== 'string') {
+      return { error: 'Name must be a string.', code: 'INVALID_NAME' };
+    }
+    const name = body.name.trim();
+    if (!name) {
+      return { error: 'Name must not be empty.', code: 'INVALID_NAME' };
+    }
+    if (name.length > 64) {
+      return { error: 'Name must be 64 characters or fewer.', code: 'NAME_TOO_LONG' };
+    }
+    return { name };
+  }
+
+  /**
+   * Normalize one Thing Model property to a frontend-friendly shape.
+   * @param {Record<string, unknown>} prop Raw property from the Thing Model.
+   * @returns {{ code: string, name: string, access: string, type: string, spec: string }} Normalized capability.
+   */
+  static describeProperty(prop) {
+    const spec = isRecord(prop.typeSpec) ? prop.typeSpec : {};
+    return {
+      code: prop.code,
+      name: typeof prop.name === 'string' && prop.name ? prop.name : prop.code,
+      access: typeof prop.accessMode === 'string' ? prop.accessMode : 'rw',
+      type: typeof spec.type === 'string' ? spec.type : 'raw',
+      spec: Device.describeSpec(spec),
+    };
+  }
+
+  /**
+   * Render a human-readable spec string for a Thing Model type spec.
+   * @param {Record<string, unknown>} spec Raw typeSpec object.
+   * @returns {string} Human-readable spec (e.g. "Reset | forceReset", "10–1000 step 1").
+   */
+  static describeSpec(spec) {
+    if (spec.type === 'bool') return 'true / false';
+    if (spec.type === 'enum') {
+      return Array.isArray(spec.range) && spec.range.length > 0
+        ? spec.range.join(' | ')
+        : 'enum';
+    }
+    if (spec.type === 'value') {
+      const min = spec.min ?? '?';
+      const max = spec.max ?? '?';
+      const step = spec.step != null ? ` step ${spec.step}` : '';
+      const unit = spec.unit ? ` ${spec.unit}` : '';
+      return `${min}–${max}${step}${unit}`.trim();
+    }
+    if (spec.type === 'string') {
+      return spec.maxlen != null ? `up to ${spec.maxlen} chars` : 'string';
+    }
+    return typeof spec.type === 'string' ? spec.type : '-';
+  }
+
+  /**
    * Perform a JSON request against the Tuya OpenAPI.
    * @param {string} path Path starting with /.
    * @param {{ method?: string, body?: string }} [init] Request options.

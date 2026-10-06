@@ -1,4 +1,5 @@
 import { PowerCard } from './components/power-card.js';
+import { DeviceInfo } from './components/device-info.js';
 
 /**
  * Query a required element by id.
@@ -12,7 +13,12 @@ function getElement(id) {
 }
 
 function bootstrap() {
-  const card = new PowerCard({
+  const message = getElement('message');
+  const notify = (text) => {
+    message.textContent = text;
+  };
+
+  const power = new PowerCard({
     elements: {
       statusDot: getElement('status-dot'),
       statusText: getElement('status-text'),
@@ -20,10 +26,13 @@ function bootstrap() {
       btnOff: getElement('btn-off'),
       btnReset: getElement('btn-reset'),
       btnForceReset: getElement('btn-force-reset'),
-      message: getElement('message'),
+      message,
     },
   });
-  card.init();
+  power.init();
+
+  const info = new DeviceInfo({ root: getElement('page'), notify });
+  info.init();
 }
 
 bootstrap();

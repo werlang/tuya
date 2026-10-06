@@ -27,3 +27,5 @@ export async function requestJson(path, { method = 'GET', body } = {}) {
 export const getJson = (path) => requestJson(path);
 
 export const postJson = (path, body) => requestJson(path, { method: 'POST', body });
+
+export const putJson = (path, body) => requestJson(path, { method: 'PUT', body });

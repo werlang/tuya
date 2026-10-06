@@ -1,4 +1,4 @@
-import { getJson, postJson } from '../helpers/api-client.js';
+import { getJson, postJson, putJson } from '../helpers/api-client.js';
 
 /**
  * Frontend Device entity. All API access goes through this model.
@@ -28,5 +28,22 @@ export class Device {
    */
   static async sendReset(mode) {
     return postJson('/api/control', { ModeReset: mode });
+  }
+
+  /**
+   * Fetch full device detail (identity, firmware, properties).
+   * @returns {Promise<{ device_id: string, name: string | null, category_name: string | null, product_name: string | null, online: boolean | null, firmware_version: string | null, firmware_update_available: boolean }>} Device detail.
+   */
+  static async fetchDevice() {
+    return getJson('/api/device');
+  }
+
+  /**
+   * Rename the device.
+   * @param {string} name New device name.
+   * @returns {Promise<unknown>} API result.
+   */
+  static async renameDevice(name) {
+    return putJson('/api/device', { name });
   }
 }

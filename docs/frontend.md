@@ -30,4 +30,4 @@ Rules (match the code): page code never calls `fetch` directly — it goes throu
 
 ## Changing UI
 
-- Markup in `index.html`, look in `styles.css` (theme via `:root` variables, 2-column `.meta` grid collapsing to 1 column under `28rem`, segmented `.seg` controls, scoped `.sched-table`), behavior in the three components. Keep `api-client.js` free of device-specific paths and `app.js` free of business logic.
+- Markup in `index.html`, look in `styles.css` (theme via `:root` variables, 2-column `.meta` grid collapsing to 1 column under `28rem`, segmented `.seg` controls, scoped `.sched-table`, wrapping form rows plus tighter padding under `28rem`), behavior in the three components. Keep `api-client.js` free of device-specific paths and `app.js` free of business logic.

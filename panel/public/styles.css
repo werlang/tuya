@@ -156,12 +156,13 @@ body {
 
 .editor {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
 
 .editor input {
-  flex: 1;
+  flex: 2 1 10rem;
   min-width: 0;
   font: inherit;
   padding: 0.5rem 0.75rem;
@@ -343,6 +344,7 @@ body {
 
 .sched-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
@@ -358,11 +360,15 @@ body {
 }
 
 .sched-row input[type="number"] {
-  flex: 1;
+  flex: 2 1 7rem;
 }
 
 .sched-row input[type="datetime-local"] {
-  flex: 1;
+  flex: 2 1 10rem;
+}
+
+.sched-row select {
+  flex: 1 1 6rem;
 }
 
 .sched-row .btn {
@@ -447,7 +453,28 @@ body {
 }
 
 @media (max-width: 28rem) {
+  .page {
+    margin: 1rem auto;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
   .meta {
     grid-template-columns: 1fr;
+  }
+
+  .btn {
+    padding: 0.7rem 1.1rem;
+  }
+
+  .sched-table {
+    font-size: 0.82rem;
+  }
+
+  .sched-table th,
+  .sched-table td {
+    padding: 0.45rem;
   }
 }

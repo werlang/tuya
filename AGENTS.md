@@ -36,6 +36,7 @@ panel/
     js/components/power-card.js  # PowerCard: live status + power/reset buttons
     js/components/device-info.js # DeviceInfo: detail + rename + copy ID
     js/components/schedule-card.js # ScheduleCard: timer form + pending table
+    js/components/toaster.js     # Toaster: stacked auto-dismiss notifications
     js/models/device.js          # frontend Device model
     js/models/schedule.js        # frontend Schedule model
     js/helpers/api-client.js     # getJson / postJson / putJson / deleteJson fetch wrapper

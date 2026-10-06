@@ -66,6 +66,7 @@ panel/
     js/components/power-card.js  # live status + power/reset buttons
     js/components/device-info.js # detail + rename + copy ID
     js/components/schedule-card.js # timers form + table
+    js/components/toaster.js     # stacked auto-dismiss notifications
     js/models/device.js          # API access
     js/models/schedule.js        # timer API access
     js/helpers/api-client.js     # fetch wrapper

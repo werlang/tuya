@@ -14,10 +14,11 @@ function labelForStatus(status) {
  */
 export class PowerCard {
   /**
-   * @param {{ elements: Record<string, HTMLElement>, confirmFn?: (message: string) => boolean }} options Component options.
+   * @param {{ elements: Record<string, HTMLElement>, notify?: (message: string, type?: string) => void, confirmFn?: (message: string) => boolean }} options Component options.
    */
-  constructor({ elements, confirmFn = (message) => window.confirm(message) }) {
+  constructor({ elements, notify = () => {}, confirmFn = (message) => window.confirm(message) }) {
     this.elements = elements;
+    this.notify = notify;
     this.confirmFn = confirmFn;
     this.isBusy = false;
   }
@@ -64,10 +65,10 @@ export class PowerCard {
     this.setBusy(true, 'Sending…');
     try {
       await Device.setSwitch(isOn);
-      this.setMessage('OK');
+      this.setMessage('OK', 'success');
       await this.refresh();
     } catch (error) {
-      this.setMessage(`Failed: ${error.message}`);
+      this.setMessage(`Failed: ${error.message}`, 'error');
     } finally {
       this.setBusy(false);
     }
@@ -83,10 +84,10 @@ export class PowerCard {
     this.setBusy(true, 'Sending…');
     try {
       await Device.sendReset(mode);
-      this.setMessage('OK');
+      this.setMessage('OK', 'success');
       await this.refresh();
     } catch (error) {
-      this.setMessage(`Failed: ${error.message}`);
+      this.setMessage(`Failed: ${error.message}`, 'error');
     } finally {
       this.setBusy(false);
     }
@@ -116,10 +117,11 @@ export class PowerCard {
   }
 
   /**
-   * Show a status message.
+   * Show a status message as a toast.
    * @param {string} message Message text.
+   * @param {'info' | 'success' | 'error'} [type] Toast variant.
    */
-  setMessage(message) {
-    this.elements.message.textContent = message;
+  setMessage(message, type = 'info') {
+    this.notify(message, type);
   }
 }

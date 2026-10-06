@@ -1,6 +1,7 @@
 import { PowerCard } from './components/power-card.js';
 import { DeviceInfo } from './components/device-info.js';
 import { ScheduleCard } from './components/schedule-card.js';
+import { Toaster } from './components/toaster.js';
 
 /**
  * Query a required element by id.
@@ -14,9 +15,9 @@ function getElement(id) {
 }
 
 function bootstrap() {
-  const message = getElement('message');
-  const notify = (text) => {
-    message.textContent = text;
+  const toaster = new Toaster({ root: getElement('toasts') });
+  const notify = (text, type) => {
+    toaster.show(text, type);
   };
 
   const power = new PowerCard({
@@ -27,8 +28,8 @@ function bootstrap() {
       btnOff: getElement('btn-off'),
       btnReset: getElement('btn-reset'),
       btnForceReset: getElement('btn-force-reset'),
-      message,
     },
+    notify,
   });
   power.init();
 

@@ -91,7 +91,7 @@ export class DeviceInfo {
     if (this.isSaving) return;
     const name = this.hook('name-input').value.trim();
     if (!name) {
-      this.notify('Name must not be empty.');
+      this.notify('Name must not be empty.', 'error');
       return;
     }
     this.isSaving = true;
@@ -101,9 +101,9 @@ export class DeviceInfo {
       this.device = { ...(this.device || {}), name };
       this.hook('name').textContent = name;
       this.stopEditing();
-      this.notify('Name updated.');
+      this.notify('Name updated.', 'success');
     } catch (error) {
-      this.notify(`Rename failed: ${error.message}`);
+      this.notify(`Rename failed: ${error.message}`, 'error');
     } finally {
       this.isSaving = false;
       this.hook('save-rename').disabled = false;
@@ -116,9 +116,9 @@ export class DeviceInfo {
     if (!deviceId) return;
     try {
       await navigator.clipboard.writeText(deviceId);
-      this.notify('Device ID copied.');
+      this.notify('Device ID copied.', 'success');
     } catch {
-      this.notify('Copy failed — select the ID manually.');
+      this.notify('Copy failed — select the ID manually.', 'error');
     }
   }
 

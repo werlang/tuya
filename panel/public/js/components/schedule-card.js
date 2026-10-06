@@ -44,7 +44,7 @@ function formatWhen(iso) {
  */
 export class ScheduleCard {
   /**
-   * @param {{ root: HTMLElement, notify?: (message: string) => void }} options Component options.
+   * @param {{ root: HTMLElement, notify?: (message: string, type?: 'info' | 'success' | 'error') => void }} options Component options.
    */
   constructor({ root, notify = () => {} }) {
     this.root = root;
@@ -132,28 +132,28 @@ export class ScheduleCard {
     if (this.selectedMode() === 'in') {
       const amount = Number(this.hook('amount').value);
       if (!Number.isFinite(amount) || amount <= 0) {
-        this.notify('Enter minutes or hours above zero.');
+        this.notify('Enter minutes or hours above zero.', 'error');
         return;
       }
       const minutes = this.hook('unit').value === 'hours' ? amount * 60 : amount;
       if (minutes > MAX_MINUTES) {
-        this.notify('Too far ahead (max 14 days).');
+        this.notify('Too far ahead (max 14 days).', 'error');
         return;
       }
       payload = { action, inSeconds: Math.round(minutes * 60) };
     } else {
       const value = this.hook('at').value;
       if (!value) {
-        this.notify('Pick a date and time.');
+        this.notify('Pick a date and time.', 'error');
         return;
       }
       const runAt = new Date(value);
       if (Number.isNaN(runAt.getTime())) {
-        this.notify('Pick a valid date and time.');
+        this.notify('Pick a valid date and time.', 'error');
         return;
       }
       if (runAt.getTime() <= Date.now()) {
-        this.notify('Time is in the past.');
+        this.notify('Time is in the past.', 'error');
         return;
       }
       // Local wall time -> absolute instant; server timezone never matters.
@@ -164,10 +164,10 @@ export class ScheduleCard {
     this.setCreateBusy(true);
     try {
       await Schedule.create(payload);
-      this.notify('Timer set.');
+      this.notify('Timer set.', 'success');
       await this.load();
     } catch (error) {
-      this.notify(`Couldn't set timer: ${error.message}`);
+      this.notify(`Couldn't set timer: ${error.message}`, 'error');
     } finally {
       this.isSaving = false;
       this.setCreateBusy(false);
@@ -183,10 +183,10 @@ export class ScheduleCard {
     button.disabled = true;
     try {
       await Schedule.cancel(id);
-      this.notify('Timer cancelled.');
+      this.notify('Timer cancelled.', 'success');
       await this.load();
     } catch (error) {
-      this.notify(`Couldn't cancel timer: ${error.message}`);
+      this.notify(`Couldn't cancel timer: ${error.message}`, 'error');
       button.disabled = false;
     }
   }
